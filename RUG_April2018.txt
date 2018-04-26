@@ -1,0 +1,105 @@
+// Register the pin that the button is
+// connected to
+
+#define bitRead(value, bit) (((value) >> (bit)) & 0x01 )
+
+int buttonPin = D6;
+int potPin = A2;
+
+// Register and Initialise a flag to hold 
+// current state.
+
+bool pressed = false;
+
+// Register a delay period to slow things
+// down if needed.
+
+int period = 100;
+
+int capData[] = {0,0,0,0,0,0,0,0};
+int photonPins[] = {D0,D1,D2,D3,D4,D5,D7,D7,D7};
+
+byte arcByte;
+
+// Perform the program setup
+
+void setup() 
+{
+    digitalWrite(buttonPin, HIGH);
+
+    for(int i = 0; i < 8; ++i)
+    {
+        pinMode(photonPins[i], OUTPUT);
+    }
+    
+    // Set the button pin as an input
+    
+    pinMode(buttonPin, INPUT);
+    pinMode(potPin, INPUT);
+    
+    // Set the pressed flag to false
+    
+    bool pressed = false;
+    
+    // Set the initial state of subscriber
+    // to off just in case.
+    
+     // Particle.publish("button-BB", "off");
+     
+     Serial.begin(9600);
+     Serial1.begin(9600);
+    
+}
+
+// Loop through the program
+
+void loop() 
+{
+    byte fred = arcByte;
+    
+    if (Serial1.available()) 
+    {
+        
+        fred = Serial1.read();
+        
+        // Read in the bits
+        
+        for(int i=0; i < 8; i++)
+        {
+            capData[i] = bitRead(fred, i);
+            digitalWrite(photonPins[i], capData[i]);
+        }
+        
+        // Serial debugging
+        
+        Serial.print("[");
+        
+        for(int i=0; i < 8; i++)
+        {
+            Serial.print(capData[i]);
+            
+            if(i != 7)
+            {
+                Serial.print(",");
+            }
+        }
+        
+        Serial.print("]");
+        Serial.print(" : ");
+        Serial.print(fred);
+        Serial.println();
+    }
+    
+     // Check to see if change in state
+        
+        if(arcByte != fred)
+        {
+            Particle.publish("iost-rug-data", String(fred));
+        }
+        
+        // Archive previous states
+        
+       arcByte = fred;
+    
+    delay(period);
+}
