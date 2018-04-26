@@ -2,116 +2,121 @@
 //
 // Capacitant Rug Slave code for the Particle Photon
 // Created by Sarah Kettley
-
+//
+//  Capacitant Node Notes:
+//      The data from the nodes is delivered in a data bus of 8 values in the array capData.
+//      Since there are only 5 Nodes the remaining 3 elements of capData are redundant
+//
+//  Publishing Stream Notes:
+//      "iost-rug-data" is publishing the state of each node check to see there are 3 values at 0 at the end
+//                      If changes to the nodes are too quick this will overwhelm the 1 message per second
+//                      limit imposed by Particle
+//
+//      "button-BB" is publishing the message "off" at setup, this may be redundant
+//
+//      rugNodePublishName is the stream under which triggering the nodes will publish a message which is limited to 1 per second
+//                         any trigger of the nodes in between the buffer period defined by `interval` will be ignored
+//
+//
 
 //================================================================================
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01 ) // Register the pin that the button is connected to [DEFFINE MACROS == BAD]
 //================================================================================
+// Publishing Stream Names
+const char* rugNodePublishName = "sarah_kettley_cap_rug_node";
+const char* rugNodePublishData = "MESSAGE TO SEND WHEN NODE IS TRIGGERED";
+//================================================================================
 // External Device Pins: These do not change so marked constant
 const int buttonPin = D6;
 const int potPin = A2;
+const int photonPins[] = {D0,D1,D2,D3,D4,D5,D7,D7,D7};
 //================================================================================
 bool pressed = false; // Register and Initialise a flag to hold current state.
 int period = 100;     // Register a delay period to slow things down if needed.
 int capData[] = {0,0,0,0,0,0,0,0};
-int photonPins[] = {D0,D1,D2,D3,D4,D5,D7,D7,D7};
 byte arcByte;
 //================================================================================
-//================================================================================
 /// Timing variables: helping to ensure that publishing isn't constant
-//================================================================================
 unsigned long previousMillis = 0; // will store last time data was published
 const long interval = 1000;       // interval at which to publish in milliseconds
 //================================================================================
+
 void setup()
 {
+  digitalWrite(buttonPin, HIGH);
 
-    digitalWrite(buttonPin, HIGH);
+  for(int i = 0; i < 8; ++i)
+  {
+    pinMode (photonPins[i], OUTPUT);
+  }
 
-    for(int i = 0; i < 8; ++i)
-    {
-        pinMode(photonPins[i], OUTPUT);
-    }
+  pinMode (buttonPin, INPUT);
+  pinMode (potPin, INPUT);
+  bool pressed = false;
 
-    // Set the button pin as an input
+  Particle.publish("button-BB", "off");
 
-    pinMode(buttonPin, INPUT);
-    pinMode(potPin, INPUT);
-
-    // Set the pressed flag to false
-
-    bool pressed = false;
-
-    // Set the initial state of subscriber
-    // to off just in case.
-
-    Particle.publish("button-BB", "off");
-
-    Serial.begin(9600);
-    Serial1.begin(9600);
-
+  Serial.begin(9600);
+  Serial1.begin(9600);
 }
 
 //================================================================================
 
 void loop()
 {
-    unsigned long currentMillis = millis(); // get the uptime in milliseconds
-    byte fred = arcByte;
+  unsigned long currentMillis = millis(); // get the uptime in milliseconds
+  byte fred = arcByte;
+  //================================================================================
+  if (Serial1.available())
+  {
+    fred = Serial1.read();
 
-    if (Serial1.available())
+    for (int i = 0; i < 8; ++i) // Read in the bits
     {
+      capData[i] = bitRead(fred, i);
+      digitalWrite(photonPins[i], capData[i]);
 
-        fred = Serial1.read();
-
-        // Read in the bits
-
-        for(int i=0; i < 8; i++)
+      if (capData[i] > LOW) // if Node is touched
+      {
+        if (currentMillis - previousMillis >= interval) // if the interval has passed
         {
-            capData[i] = bitRead(fred, i);
-            digitalWrite(photonPins[i], capData[i]);
-
-
-            if (capData[i] > LOW)
-            {
-                if (currentMillis - previousMillis >= interval)
-                {
-                    Particle.publish (rugNodePublishName, rugNodePublishString);
-                    previousMillis = currentMillis;
-                }
-            }
+          Particle.publish (rugNodePublishName, rugNodePublishData);
+          previousMillis = currentMillis;
         }
+      }
+    }
+    //================================================================================
+    // Serial debugging
 
-        // Serial debugging
+    Serial.print("[");
 
-        Serial.print("[");
+    for(int i = 0; i < 8; ++i)
+    {
+      Serial.print(capData[i]);
 
-        for(int i=0; i < 8; i++)
-        {
-            Serial.print(capData[i]);
-
-            if(i != 7)
-            {
-                Serial.print(",");
-            }
-        }
-
-        Serial.print("]");
-        Serial.print(" : ");
-        Serial.print(fred);
-        Serial.println();
+      if(i != 7)
+      {
+        Serial.print(",");
+      }
     }
 
-     // Check to see if change in state
+    Serial.print("]");
+    Serial.print(" : ");
+    Serial.print(fred);
+    Serial.println();
+  }
 
-        if(arcByte != fred)
-        {
-            Particle.publish("iost-rug-data", String(fred));
-        }
+  // Check to see if change in state
 
-        // Archive previous states
+  if(arcByte != fred)
+  {
+    Particle.publish("iost-rug-data", String(fred));
+  }
 
-       arcByte = fred;
-
-    delay(period);
+  // Archive previous states
+  arcByte = fred;
+  delay(period);
 }
+
+//================================================================================
+// EOF
