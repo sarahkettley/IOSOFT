@@ -35,4 +35,9 @@ void rotateServo (int servoPin, int interval, int repeat)
       delay(interval);
     }
   }
+  pinMode(D2, OUTPUT);
+  digitalWrite(D2, HIGH);
+  delay(500);
+  digitalWrite(D2, LOW);
+  delay(500);
 }
