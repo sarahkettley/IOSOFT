@@ -110,7 +110,7 @@ void loop()
 
   if(arcByte != fred)
   {
-    Particle.publish("iost-rug-data", String(fred));
+    //Particle.publish("iost-rug-data", String(fred));
   }
 
   // Archive previous states
