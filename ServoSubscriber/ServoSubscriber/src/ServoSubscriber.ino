@@ -7,7 +7,7 @@
 
 void setup()
 {
-  Particle.subscribe ("rug_node01", mattsHandleFunc);
+  Particle.subscribe ("rug_node01", mattsHandleFunc, MY_DEVICES);
 }
 
 void loop()

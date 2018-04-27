@@ -80,7 +80,7 @@ void loop()
       {
         if (currentMillis - previousMillis >= interval) // if the interval has passed
         {
-          Particle.publish (rugNodePublishName, rugNodePublishData);
+          Particle.publish (rugNodePublishName, rugNodePublishData, NULL, PRIVATE);
           previousMillis = currentMillis;
         }
       }
