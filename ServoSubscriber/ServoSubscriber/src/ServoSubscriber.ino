@@ -7,7 +7,7 @@
 
 void setup()
 {
-  Particle.subscribe ("rug01", mattsHandleFunc);
+  Particle.subscribe ("rug_node01", mattsHandleFunc);
 }
 
 void loop()
@@ -23,21 +23,21 @@ void mattsHandleFunc (const char* event, const char* data)
 /** rotate a servo a number of times */
 void rotateServo (int servoPin, int interval, int repeat)
 {
-  Servo rotatingServo, secondServo;
-  rotatingServo.attach(servoPin);
-  secondServo.attach(D1);
-  for (int i = 0; i < repeat; ++i)
-  {
-    for (int degrees = 0; degrees < 180; ++degrees)
-    {
-      rotatingServo.write(degrees);
-      secondServo.write(180-degrees);
-      delay(interval);
-    }
-  }
-  pinMode(D2, OUTPUT);
-  digitalWrite(D2, HIGH);
+//  Servo rotatingServo, secondServo;
+  // rotatingServo.attach(servoPin);
+  // secondServo.attach(D1);
+  // for (int i = 0; i < repeat; ++i)
+  // {
+  //   for (int degrees = 0; degrees < 180; ++degrees)
+  //   {
+  //     rotatingServo.write(degrees);
+  //     secondServo.write(180-degrees);
+  //     delay(interval);
+  //   }
+  // }
+  pinMode(D7, OUTPUT);
+  digitalWrite(D7, HIGH);
   delay(500);
-  digitalWrite(D2, LOW);
+  digitalWrite(D7, LOW);
   delay(500);
 }
