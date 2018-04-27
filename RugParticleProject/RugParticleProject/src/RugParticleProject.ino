@@ -23,8 +23,8 @@
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01 ) // Register the pin that the button is connected to [DEFFINE MACROS == BAD]
 //================================================================================
 // Publishing Stream Names
-const char* rugNodePublishName = "sarah_kettley_cap_rug_node";
-const char* rugNodePublishData = "MESSAGE TO SEND WHEN NODE IS TRIGGERED";
+const char* rugNodePublishName = "rug01";
+const char* rugNodePublishData = "rug02";
 //================================================================================
 // External Device Pins: These do not change so marked constant
 const int buttonPin = D6;
