@@ -24,7 +24,7 @@
 //================================================================================
 // Publishing Stream Names
 const char* rugNodePublishName = "rug01";
-const char* rugNodePublishData = "rug02";
+const char* rugNodePublishData = "rug01_data";
 //================================================================================
 // External Device Pins: These do not change so marked constant
 const int buttonPin = D6;
