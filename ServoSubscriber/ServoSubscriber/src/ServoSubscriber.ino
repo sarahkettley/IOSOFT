@@ -7,7 +7,7 @@
 
 void setup()
 {
-  Particle.subscribe ("wearingdata_Sarah_2018", mattsHandleFunc);
+  Particle.subscribe ("rug01", mattsHandleFunc);
 }
 
 void loop()
