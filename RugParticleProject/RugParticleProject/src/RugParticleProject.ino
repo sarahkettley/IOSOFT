@@ -1,7 +1,11 @@
 // IOSOFT
 //
-// Capacitant Rug Slave code for the Particle Photon
-// Created by Sarah Kettley
+//  Description:
+//      Capacitant Rug Slave code for the Particle Photon
+//
+//  Created by Sarah Kettley
+//
+//  Date: 01/05/2018
 //
 //  Capacitant Node Notes:
 //      The data from the nodes is delivered in a data bus of 8 values in the array capData.
@@ -16,14 +20,12 @@
 //
 //      rugNodePublishName is the stream under which triggering the nodes will publish a message which is limited to 1 per second
 //                         any trigger of the nodes in between the buffer period defined by `interval` will be ignored
-//
-//  I've made a change here
 
 //================================================================================
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01 ) // Register the pin that the button is connected to [DEFFINE MACROS == BAD]
 //================================================================================
 // Publishing Stream Names
-const char* rugNodePublishName = "rug_node01";
+const char* rugNodePublishName = "rug_01";
 const char* rugNodePublishData = "rug01_data";
 //================================================================================
 // External Device Pins: These do not change so marked constant
@@ -38,7 +40,7 @@ byte arcByte;
 //================================================================================
 /// Timing variables: helping to ensure that publishing isn't constant
 unsigned long previousMillis = 0; // will store last time data was published
-const long interval = 1000;       // interval at which to publish in milliseconds
+const long interval = 2000;       // interval at which to publish in milliseconds
 //================================================================================
 
 void setup()
@@ -80,7 +82,8 @@ void loop()
       {
         if (currentMillis - previousMillis >= interval) // if the interval has passed
         {
-          Particle.publish (rugNodePublishName, rugNodePublishData, NULL, PRIVATE);
+        //   Particle.publish (rugNodePublishName, rugNodePublishData, NULL, PRIVATE);
+          Particle.publish(rugNodePublishName, rugNodePublishData, 60, PUBLIC);
           previousMillis = currentMillis;
         }
       }
